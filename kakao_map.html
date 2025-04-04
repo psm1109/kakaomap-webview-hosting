@@ -2,10 +2,25 @@
 <html>
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Kakao Map</title>
+        <style>
+            /* 지도 크기를 화면 전체로 확장 */
+            html, body {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+                overflow: hidden; /* 스크롤 방지 */
+            }
+            #map {
+                width: 100vw;
+                height: 100vh;
+            }
+        </style>
     </head>
     <body>
-        <div id="map" style="width: 600px; height: 800px"></div>
+        <div id="map"></div>
         <script
             type="text/javascript"
             src="//dapi.kakao.com/v2/maps/sdk.js?appkey=3ac582707ed7360421002e0d1a6fe1cd"
