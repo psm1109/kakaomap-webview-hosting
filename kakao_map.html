@@ -42,7 +42,7 @@
 
             window.document.addEventListener("message", function (event) {
                 const data = JSON.parse(event.data);
-                setCenter(data.x, data.y);
+                setCenter(data.y, data.x);
             });
         </script>
     </body>
