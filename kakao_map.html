@@ -92,7 +92,7 @@
                         if (status === kakao.maps.services.Status.OK) {
                             var detailAddr = "<div>" + result[0].address.address_name + "</div>";
 
-                            var content = '<div class="bAddr">' + detailAddr + "</div>";
+                            var content = '<div class="customInfoWindow">' + detailAddr + "</div>";
 
                             marker.setPosition(new kakao.maps.LatLng(latlng.getLat(), latlng.getLng()));
 
@@ -104,5 +104,19 @@
                 });
             }
         </script>
+        <style>
+            .customInfoWindow {
+                width: 200px;
+                max-width: 300px;
+                word-wrap: break-word;
+                font-size: 15px;
+                line-height: 1.5;
+                white-space: normal;
+                text-align: center;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+        </style>
     </body>
 </html>
