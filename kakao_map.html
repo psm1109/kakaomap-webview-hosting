@@ -43,6 +43,17 @@
                 var moveLatLon = new kakao.maps.LatLng(x, y);
                 map.setCenter(moveLatLon);
             }
+
+            // 좌표로 행정동 주소 정보를 요청합니다
+            function searchAddrFromCoords(coords, callback) {
+                geocoder.coord2RegionCode(coords.getLng(), coords.getLat(), callback);
+            }
+
+            // 좌표로 법정동 상세 주소 정보를 요청합니다
+            function searchDetailAddrFromCoords(coords, callback) {
+                geocoder.coord2Address(coords.getLng(), coords.getLat(), callback);
+            }
+
             //Expo  -> 지도 중심 이동
             window.document.addEventListener("message", function (event) {
                 const data = JSON.parse(event.data);
@@ -88,12 +99,11 @@
                             detailAddr += "<div>지번 주소 : " + result[0].address.address_name + "</div>";
 
                             var content = '<div class="bAddr">' + detailAddr + "</div>";
-
-                            // 마커를 클릭한 위치에 표시합니다
+                            // 마커를 표시합니다
                             marker.setMap(map);
                             marker.setPosition(new kakao.maps.LatLng(latlng.getLat(), latlng.getLng()));
 
-                            // 인포윈도우에 클릭한 위치에 대한 법정동 상세 주소정보를 표시합니다
+                            // 인포윈도우에 위치에 대한 법정동 상세 주소정보를 표시합니다
                             infowindow.setContent(content);
                             infowindow.open(map, marker);
                         }
@@ -120,16 +130,6 @@
                         }
                     });
                 });
-
-                function searchAddrFromCoords(coords, callback) {
-                    // 좌표로 행정동 주소 정보를 요청합니다
-                    geocoder.coord2RegionCode(coords.getLng(), coords.getLat(), callback);
-                }
-
-                function searchDetailAddrFromCoords(coords, callback) {
-                    // 좌표로 법정동 상세 주소 정보를 요청합니다
-                    geocoder.coord2Address(coords.getLng(), coords.getLat(), callback);
-                }
             }
         </script>
     </body>
