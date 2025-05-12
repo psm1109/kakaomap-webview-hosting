@@ -29,7 +29,7 @@
             const urlParams = new URLSearchParams(location.search);
             const mode = urlParams.get("mode");
 
-            window.staticMaplatlng = { lat: 0, lng: 0 };
+            window.staticMaplatlng = { lat: 35.15385872250456, lng: 128.10169273462938 };
 
             if (mode !== "staticMap") {
                 //맵 생성
@@ -42,15 +42,18 @@
                 };
                 var map = new kakao.maps.Map(container, options);
             } else {
-                var container = document.getElementById("map");
-                var options = {
-                    center: new kakao.maps.LatLng(window.staticMaplatlng.lat, window.staticMaplatlng.lng),
-                    level: 3,
-                    draggable: false,
-                    disableDoubleClickZoom: true,
-                };
+                setTimeout(function () {
+                    // staticMap
+                    var container = document.getElementById("map");
+                    var options = {
+                        center: new kakao.maps.LatLng(window.staticMaplatlng.lat, window.staticMaplatlng.lng),
+                        level: 3,
+                        draggable: false,
+                        disableDoubleClickZoom: true,
+                    };
 
-                var staticMap = new kakao.maps.Map(container, options);
+                    var staticMap = new kakao.maps.Map(container, options);
+                }, 100);
             }
 
             // 중심이동
