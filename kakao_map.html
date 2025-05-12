@@ -51,18 +51,18 @@
                     setCenter(lat, lng);
                 }
 
-                if (data.type === "getAddress") {
-                    var latlng = map.getCenter();
-                    const message = {
-                        type: "LOCATION",
-                        payload: {
-                            lat: latlng.getLat(),
-                            lng: latlng.getLng(),
-                            address: detailAddr,
-                        },
-                    };
-                    window.ReactNativeWebView.postMessage(JSON.stringify(message));
-                }
+                // if (data.type === "getAddress") {
+                //     var latlng = map.getCenter();
+                //     const message = {
+                //         type: "LOCATION",
+                //         payload: {
+                //             lat: latlng.getLat(),
+                //             lng: latlng.getLng(),
+                //             address: detailAddr,
+                //         },
+                //     };
+                //     window.ReactNativeWebView.postMessage(JSON.stringify(message));
+                // }
             });
 
             if (mode === "writePost") {
