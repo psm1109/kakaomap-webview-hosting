@@ -46,11 +46,12 @@
 
             window.addEventListener("message", function (event) {
                 const data = JSON.parse(event.data);
-                if (data.type === "setCenter") {
-                    const { lat, lng } = data.payload;
-                    setCenter(lat, lng);
-                }
-
+                setCenter(data.lat, data.lng);
+                // if (data.type === "setCenter") {
+                //     const { lat, lng } = data.payload;
+                //     setCenter(lat, lng);
+                // }
+                
                 // if (data.type === "getAddress") {
                 //     var latlng = map.getCenter();
                 //     const message = {
