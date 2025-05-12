@@ -44,10 +44,25 @@
                 map.setCenter(moveLatLon);
             }
 
-            //Expo  -> 지도 중심 이동
             window.document.addEventListener("message", function (event) {
                 const data = JSON.parse(event.data);
-                setCenter(data.lat, data.lng);
+                if (data.type === "setCenter") {
+                    const { lat, lng } = data.payload;
+                    setCenter(lat, lng);
+                }
+
+                if (data.type === "getAdress") {
+                    var latlng = map.getCenter();
+                    const message = {
+                        type: "LOCATION",
+                        payload: {
+                            lat: latlng.getLat(),
+                            lng: latlng.getLng(),
+                            address: detailAddr,
+                        },
+                    };
+                    window.ReactNativeWebView.postMessage(JSON.stringify(message));
+                }
             });
 
             if (mode === "writePost") {
@@ -59,6 +74,7 @@
                 });
                 marker.setMap(map);
 
+                var detailAddr = "";
                 var infowindow = new kakao.maps.InfoWindow({ zindex: 1 });
                 // 주소-좌표 변환 객체를 생성합니다
                 var geocoder = new kakao.maps.services.Geocoder();
@@ -90,9 +106,9 @@
                     var latlng = map.getCenter();
                     searchDetailAddrFromCoords(latlng, function (result, status) {
                         if (status === kakao.maps.services.Status.OK) {
-                            var detailAddr = "<div>" + result[0].address.address_name + "</div>";
+                            detailAddr = result[0].address.address_name;
 
-                            var content = '<div class="customInfoWindow">' + detailAddr + "</div>";
+                            var content = '<div class="customInfoWindow">' + "<div>" + detailAddr + "</div>" + "</div>";
 
                             marker.setPosition(new kakao.maps.LatLng(latlng.getLat(), latlng.getLng()));
 
@@ -104,19 +120,20 @@
                 });
             }
         </script>
-        <style>
-            .customInfoWindow {
-                width: 200px;
-                max-width: 300px;
-                word-wrap: break-word;
-                font-size: 15px;
-                line-height: 1.5;
-                white-space: normal;
-                text-align: center;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-        </style>
     </body>
 </html>
+
+<style>
+    .customInfoWindow {
+        width: 200px;
+        max-width: 300px;
+        word-wrap: break-word;
+        font-size: 15px;
+        line-height: 1.5;
+        white-space: normal;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
