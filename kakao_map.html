@@ -35,25 +35,14 @@
                 //맵 생성
                 var container = document.getElementById("map");
 
-                navigator.geolocation.getCurrentPosition(
-                    function (position) {
-                        var lat = position.coords.latitude;
-                        var lng = position.coords.longitude;
-                        var options = {
-                            center: new kakao.maps.LatLng(lat, lng),
-                            level: 4,
-                        };
-                        var map = new kakao.maps.Map(document.getElementById("map"), options);
-                    },
-                    function (error) {
-                        console.error("위치 정보를 가져올 수 없습니다.");
-                        var options = {
-                            center: new kakao.maps.LatLng(35.15385872250456, 128.10169273462938), // 기본 좌표
-                            level: 4,
-                        };
-                        var map = new kakao.maps.Map(document.getElementById("map"), options);
-                    }
-                );
+                var container = document.getElementById("map");
+                var options = {
+                    center: new kakao.maps.LatLng(35.15385872250456, 128.10169273462938),
+                    level: 4,
+                    maxLevel: 8,
+                    disableDoubleClickZoom: true,
+                };
+                var map = new kakao.maps.Map(container, options);
             } else {
                 setTimeout(function () {
                     // staticMap
