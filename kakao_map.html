@@ -29,14 +29,24 @@
             const urlParams = new URLSearchParams(location.search);
             const mode = urlParams.get("mode");
 
-            //맵 생성
-            var container = document.getElementById("map");
-            var options = {
-                center: new kakao.maps.LatLng(35.15385872250456, 128.10169273462938),
-                level: 4,
-                maxLevel: 8,
-            };
-            var map = new kakao.maps.Map(container, options);
+            if (mode !== "staticMap") {
+                //맵 생성
+                var container = document.getElementById("map");
+                var options = {
+                    center: new kakao.maps.LatLng(35.15385872250456, 128.10169273462938),
+                    level: 4,
+                    maxLevel: 8,
+                };
+                var map = new kakao.maps.Map(container, options);
+            } else {
+                var container = document.getElementById("map");
+                var options = {
+                    center: new kakao.maps.LatLng(window.staticMaplatlng.lat, window.staticMaplatlng.lng),
+                    level: 3,
+                };
+
+                var staticMap = new kakao.maps.StaticMap(container, options);
+            }
 
             // 중심이동
             function setCenter(x, y) {
@@ -132,14 +142,6 @@
                         }
                     });
                 });
-            }
-
-            if (mode === "staticMap") {
-                var staticMapOption = {
-                    center: new kakao.maps.LatLng(staticMaplatlng.lat, stsaticMaplatlng.lng),
-                    level: 3,
-                };
-                map = new kakao.maps.StaticMap(container, staticMapOption);
             }
         </script>
     </body>
