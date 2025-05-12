@@ -78,7 +78,19 @@
                 var infowindow = new kakao.maps.InfoWindow({ zindex: 1 });
                 // 주소-좌표 변환 객체를 생성합니다
                 var geocoder = new kakao.maps.services.Geocoder();
+                searchDetailAddrFromCoords(latlng, function (result, status) {
+                    if (status === kakao.maps.services.Status.OK) {
+                        detailAddr = result[0].address.address_name;
 
+                        var content = '<div class="customInfoWindow">' + "<div>" + detailAddr + "</div>" + "</div>";
+
+                        marker.setPosition(new kakao.maps.LatLng(latlng.getLat(), latlng.getLng()));
+
+                        // 인포윈도우에 클릭한 위치에 대한 법정동 상세 주소정보를 표시합니다
+                        infowindow.setContent(content);
+                        infowindow.open(map, marker);
+                    }
+                });
                 // 좌표로 행정동 주소 정보를 요청합니다
                 function searchAddrFromCoords(coords, callback) {
                     geocoder.coord2RegionCode(coords.getLng(), coords.getLat(), callback);
