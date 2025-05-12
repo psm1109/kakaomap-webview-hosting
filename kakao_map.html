@@ -46,12 +46,12 @@
 
             window.document.addEventListener("message", function (event) {
                 const data = JSON.parse(event.data);
-                
+
                 if (data.type === "setCenter") {
                     const { lat, lng } = data.payload;
                     setCenter(lat, lng);
                 }
-                
+
                 if (data.type === "getAddress") {
                     var latlng = map.getCenter();
                     const message = {
@@ -62,8 +62,8 @@
                             address: detailAddr,
                         },
                     };
+
                     window.ReactNativeWebView.postMessage(JSON.stringify(message));
-                    
                 }
             });
 
@@ -132,6 +132,14 @@
                         }
                     });
                 });
+            }
+
+            if (mode === "staticMap") {
+                var staticMapOption = {
+                    center: new kakao.maps.LatLng(staticMaplatlng.lat, stsaticMaplatlng.lng),
+                    level: 3,
+                };
+                map = new kakao.maps.StaticMap(container, staticMapOption);
             }
         </script>
     </body>
