@@ -53,7 +53,15 @@
 
                 if (data.type === "getAddress") {
                     var latlng = map.getCenter();
-                    setCenter(latlng.getLat() + 10, latlng.getLng() + 20);
+                    const message = {
+                        type: "LOCATION",
+                        payload: {
+                            lat: latlng.getLat(),
+                            lng: latlng.getLng(),
+                            address: detailAddr,
+                        },
+                    };
+                    window.ReactNativeWebView.postMessage(JSON.stringify(message));
                 }
             });
 
