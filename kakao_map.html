@@ -44,7 +44,7 @@
                 map.setCenter(moveLatLon);
             }
 
-            window.addEventListener("message", function (event) {
+            window.document.addEventListener("message", function (event) {
                 const data = JSON.parse(event.data);
                 
                 if (data.type === "setCenter") {
