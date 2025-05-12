@@ -26,9 +26,11 @@
             src="//dapi.kakao.com/v2/maps/sdk.js?appkey=3ac582707ed7360421002e0d1a6fe1cd&libraries=services"
         ></script>
         <script>
+            window.staticMaplatlng = { lat: 0, lng: 0 };
+            
             const urlParams = new URLSearchParams(location.search);
             const mode = urlParams.get("mode");
-
+            
             if (mode !== "staticMap") {
                 //맵 생성
                 var container = document.getElementById("map");
@@ -41,7 +43,7 @@
             } else {
                 var container = document.getElementById("map");
                 var options = {
-                    center: new kakao.maps.LatLng(35.15385872250456, 128.10169273462938),
+                    center: new kakao.maps.LatLng(window.staticMaplatlng.lat, window.staticMaplatlng.lng),
                     level: 3,
                 };
 
