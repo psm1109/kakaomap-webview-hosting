@@ -28,11 +28,9 @@
         <script>
             const urlParams = new URLSearchParams(location.search);
             const mode = urlParams.get("mode");
-
-            window.staticMaplatlng = { lat: 35.15385872250456, lng: 128.10169273462938 };
-
+            //맵 생성
             if (mode !== "staticMap") {
-                //맵 생성
+                //동적 지도
                 var container = document.getElementById("map");
 
                 var container = document.getElementById("map");
@@ -45,7 +43,9 @@
                 var map = new kakao.maps.Map(container, options);
             } else {
                 setTimeout(function () {
-                    // staticMap
+                    // 게시글 상세보기 정적 지도
+                    window.staticMaplatlng = { lat: 35.15385872250456, lng: 128.10169273462938 };
+
                     var container = document.getElementById("map");
                     var options = {
                         center: new kakao.maps.LatLng(window.staticMaplatlng.lat, window.staticMaplatlng.lng),
@@ -58,12 +58,12 @@
                 }, 100);
             }
 
-            // 중심이동
+            //지도 중심 이동 함수
             function setCenter(x, y) {
                 var moveLatLon = new kakao.maps.LatLng(x, y);
                 map.setCenter(moveLatLon);
             }
-
+            //expo로부터 메세지를 받으면 작동하는 핸들러
             window.document.addEventListener("message", function (event) {
                 const data = JSON.parse(event.data);
 
@@ -72,6 +72,7 @@
                     setCenter(lat, lng);
                 }
 
+                //게시글 작성시 위치 설정할 때
                 if (data.type === "getAddress") {
                     var latlng = map.getCenter();
                     const message = {
@@ -87,7 +88,147 @@
                 }
             });
 
-            if (mode === "writePost") {
+            //메인 화면일 때
+            if (mode === "main") {
+                var posts = [];
+                var markers = [];
+                // 상태별 색상 클래스 반환 함수 (border와 badge에 모두 사용)
+                function getStatusClass(status) {
+                    switch (status) {
+                        case "실종":
+                            return "status-missing";
+                        case "목격":
+                            return "status-witness";
+                        case "입양대기":
+                            return "status-adopt";
+                        case "공고중":
+                            return "status-notice";
+                        default:
+                            return "status-default";
+                    }
+                }
+                // 커스텀 마커 생성 함수
+                function createCustomMarker(lat, lng, imageUrl, status) {
+                    // 마커 전체 컨테이너
+                    var markerContent = document.createElement("div");
+                    markerContent.className = "custom-marker-wrapper";
+
+                    // 원형 이미지와 테두리
+                    var circle = document.createElement("div");
+                    circle.className = "custom-marker-circle " + getStatusClass(status);
+                    var img = document.createElement("img");
+                    img.src = imageUrl;
+                    circle.appendChild(img);
+                    markerContent.appendChild(circle);
+
+                    // 상태 텍스트 배지
+                    var badge = document.createElement("div");
+                    badge.className = "custom-marker-badge " + getStatusClass(status);
+                    badge.innerText = status;
+                    markerContent.appendChild(badge);
+
+                    var customOverlay = new kakao.maps.CustomOverlay({
+                        position: new kakao.maps.LatLng(lat, lng),
+                        content: markerContent,
+                        yAnchor: 1,
+                    });
+
+                    customOverlay.setMap(map);
+                }
+
+                //지도의 중심이 바뀌면 (확대,축소,이동) 지도의 bounds 를 계산하여 그 범위에 포함되는 게시글, 마커를 가져오는 api를 호출하는 코드 작성
+                // kakao.maps.event.addListener(map, "idle", function () {
+                // });
+
+                //호출된 게시글, 마커를 화면에 표시하는 코드 예시
+
+                //임시 데이터
+                posts = [
+                    {
+                        postId: 101,
+                        state: "실종",
+                        date: "2025-04-08T15:30:00Z",
+                        address: "",
+                        description: "",
+                        imageUrl:
+                            "https://cdn.pixabay.com/photo/2025/05/12/11/43/golden-retriever-amber-blue-9595177_640.jpg",
+                    },
+                    {
+                        postId: 102,
+                        state: "목격",
+                        date: "2025-04-07T12:00:00Z",
+                        address: "",
+                        description: "",
+                        imageUrl: "https://cdn.pixabay.com/photo/2022/10/24/14/21/puppy-7543571_640.jpg",
+                    },
+                    {
+                        postId: 103,
+                        state: "공고중",
+                        date: "2025-04-08T15:30:00Z",
+                        address: "",
+                        description: "",
+                        imageUrl: "https://cdn.pixabay.com/photo/2014/03/05/19/23/dog-280332_640.jpg",
+                    },
+                    {
+                        postId: 104,
+                        state: "입양대기",
+                        date: "2025-04-07T12:00:00Z",
+                        address: "",
+                        description: "",
+                        imageUrl: "https://cdn.pixabay.com/photo/2017/10/04/02/24/puppy-2814858_640.jpg",
+                    },
+                ];
+                markers = [
+                    {
+                        postId: 101,
+                        state: "실종",
+                        species: "강아지",
+                        coordinate: {
+                            latitude: 35.15370617788286,
+                            longitude: 128.10458786497426,
+                        },
+                    },
+                    {
+                        postId: 102,
+                        state: "목격",
+                        species: "강아지",
+                        coordinate: {
+                            latitude: 35.15025559573217,
+                            longitude: 128.10344385423755,
+                        },
+                    },
+                    {
+                        postId: 103,
+                        state: "입양대기",
+                        species: "강아지",
+                        coordinate: {
+                            latitude: 35.15437516280344,
+                            longitude: 128.0864234799635,
+                        },
+                    },
+                    {
+                        postId: 104,
+                        state: "공고중",
+                        species: "강아지",
+                        coordinate: {
+                            latitude: 35.16341285540574,
+                            longitude: 128.1115239070281,
+                        },
+                    },
+                ];
+                for (let i = 0; i < posts.length; i++) {
+                    let marker = markers[i];
+                    let post = posts[i];
+                    createCustomMarker(
+                        marker.coordinate.latitude,
+                        marker.coordinate.longitude,
+                        post.imageUrl || "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+                        marker.state
+                    );
+                }
+            }
+            // 글쓰기 모드일 때
+            else if (mode === "writePost") {
                 // 지도 중앙에 마커를 생성합니다
                 var latlng = map.getCenter();
                 var markerPosition = new kakao.maps.LatLng(latlng.getLat(), latlng.getLng());
@@ -158,6 +299,7 @@
 </html>
 
 <style>
+    /* 게시글 작성 시 위치 설정 인포윈도우 */
     .customInfoWindow {
         width: 200px;
         max-width: 300px;
@@ -169,5 +311,74 @@
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+    /* 메인화면 마커 스타일 */
+    .custom-marker-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+    }
+    .custom-marker-circle {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        border: 2.5px solid #ccc;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        margin-bottom: 3px;
+    }
+    .custom-marker-circle img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+    .custom-marker-circle.status-missing {
+        border-color: #ff3b30;
+    }
+    .custom-marker-circle.status-witness {
+        border-color: #0057ff;
+    }
+    .custom-marker-circle.status-adopt {
+        border-color: #ffd600;
+    }
+    .custom-marker-circle.status-notice {
+        border-color: #1abc54;
+    }
+    .custom-marker-circle.status-default {
+        border-color: #ccc;
+    }
+    .custom-marker-badge {
+        min-width: 30px;
+        padding: 3px 9px;
+        border-radius: 10px;
+        color: #fff;
+        font-weight: bold;
+        font-size: 11px;
+        text-align: center;
+        margin-top: 0px;
+        margin-bottom: 0px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        letter-spacing: 1px;
+    }
+    .custom-marker-badge.status-missing {
+        background: #ff3b30;
+    }
+    .custom-marker-badge.status-witness {
+        background: #0057ff;
+    }
+    .custom-marker-badge.status-adopt {
+        background: #ffd600;
+    }
+    .custom-marker-badge.status-notice {
+        background: #1abc54;
+    }
+    .custom-marker-badge.status-default {
+        background: #ccc;
     }
 </style>
