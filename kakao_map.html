@@ -66,11 +66,9 @@
             //expo로부터 메세지를 받으면 작동하는 핸들러
             window.document.addEventListener("message", function (event) {
                 const data = JSON.parse(event.data);
-                
                 if (data.type === "webviewRelayout") {
                     map.relayout();
                 }
-                
                 if (data.type === "setCenter") {
                     const { lat, lng } = data.payload;
                     setCenter(lat, lng);
@@ -139,12 +137,6 @@
 
                     customOverlay.setMap(map);
                 }
-
-                //지도의 중심이 바뀌면 (확대,축소,이동) 지도의 bounds 를 계산하여 그 범위에 포함되는 게시글, 마커를 가져오는 api를 호출하는 코드 작성
-                // kakao.maps.event.addListener(map, "idle", function () {
-                // });
-
-                //호출된 게시글, 마커를 화면에 표시하는 코드 예시
 
                 //임시 데이터
                 posts = [
