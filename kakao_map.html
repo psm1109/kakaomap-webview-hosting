@@ -1,300 +1,238 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Kakao Map</title>
-        <style>
-            html,
-            body {
-                margin: 0;
-                padding: 0;
-                width: 100%;
-                height: 100%;
-                overflow: hidden;
-            }
-            #map {
-                width: 100vw;
-                height: 100vh;
-            }
-        </style>
-    </head>
-    <body>
-        <div id="map"></div>
-        <script
-            type="text/javascript"
-            src="//dapi.kakao.com/v2/maps/sdk.js?appkey=3ac582707ed7360421002e0d1a6fe1cd&libraries=services"
-        ></script>
-        <script>
-            const urlParams = new URLSearchParams(location.search);
-            const mode = urlParams.get("mode");
-            //맵 생성
-            if (mode !== "staticMap") {
-                //동적 지도
-                var container = document.getElementById("map");
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kakao Map</title>
+    <style>
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
+        #map { width: 100vw; height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=3ac582707ed7360421002e0d1a6fe1cd&libraries=services"></script>
+    <script>
+        const urlParams = new URLSearchParams(location.search);
+        const mode = urlParams.get("mode");
+        var map = null;
+        var detailAddr = "";
 
+        // 지도 생성
+        if (mode !== "staticMap") {
+            var container = document.getElementById("map");
+            var options = {
+                center: new kakao.maps.LatLng(35.15385872250456, 128.10169273462938),
+                level: 4,
+                maxLevel: 8,
+                disableDoubleClickZoom: true,
+            };
+            map = new kakao.maps.Map(container, options);
+        } else {
+            setTimeout(function () {
+                window.staticMaplatlng = { lat: 35.15385872250456, lng: 128.10169273462938 };
                 var container = document.getElementById("map");
                 var options = {
-                    center: new kakao.maps.LatLng(35.15385872250456, 128.10169273462938),
-                    level: 4,
-                    maxLevel: 8,
+                    center: new kakao.maps.LatLng(window.staticMaplatlng.lat, window.staticMaplatlng.lng),
+                    level: 3,
+                    draggable: false,
                     disableDoubleClickZoom: true,
                 };
-                var map = new kakao.maps.Map(container, options);
-            } else {
-                setTimeout(function () {
-                    // 게시글 상세보기 정적 지도
-                    window.staticMaplatlng = { lat: 35.15385872250456, lng: 128.10169273462938 };
+                map = new kakao.maps.Map(container, options);
+            }, 100);
+        }
 
-                    var container = document.getElementById("map");
-                    var options = {
-                        center: new kakao.maps.LatLng(window.staticMaplatlng.lat, window.staticMaplatlng.lng),
-                        level: 3,
-                        draggable: false,
-                        disableDoubleClickZoom: true,
-                    };
-
-                    var staticMap = new kakao.maps.Map(container, options);
-                }, 100);
-            }
-
-            //지도 중심 이동 함수
-            function setCenter(x, y) {
+        // 지도 중심 이동 함수
+        function setCenter(x, y) {
+            if (map) {
                 var moveLatLon = new kakao.maps.LatLng(x, y);
                 map.setCenter(moveLatLon);
             }
-            //expo로부터 메세지를 받으면 작동하는 핸들러
-            window.document.addEventListener("message", function (event) {
-                const data = JSON.parse(event.data);
-                if (data.type === "webviewRelayout") {
-                    map.relayout();
-                }
-                if (data.type === "setCenter") {
-                    const { lat, lng } = data.payload;
-                    setCenter(lat, lng);
-                }
+        }
 
-                if (data.type === "getAddress") {
-                    var latlng = map.getCenter();
-                    const message = {
-                        type: "LOCATION",
-                        payload: {
-                            lat: latlng.getLat(),
-                            lng: latlng.getLng(),
-                            address: detailAddr,
-                        },
-                    };
-
+        // expo로부터 메세지를 받으면 작동하는 핸들러
+        window.document.addEventListener("message", function (event) {
+            let data;
+            try {
+                data = JSON.parse(event.data);
+            } catch (e) {
+                return;
+            }
+            if (!map) return;
+            if (data.type === "webviewRelayout") {
+                map.relayout();
+            }
+            if (data.type === "setCenter") {
+                const { lat, lng } = data.payload;
+                setCenter(lat, lng);
+            }
+            if (data.type === "getAddress") {
+                var latlng = map.getCenter();
+                const message = {
+                    type: "LOCATION",
+                    payload: {
+                        lat: latlng.getLat(),
+                        lng: latlng.getLng(),
+                        address: detailAddr,
+                    },
+                };
+                if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
                     window.ReactNativeWebView.postMessage(JSON.stringify(message));
+                }
+            }
+        });
+
+        // 메인 화면일 때
+        if (mode === "main") {
+            var posts = [
+                {
+                    postId: 101,
+                    state: "실종",
+                    date: "2025-04-08T15:30:00Z",
+                    address: "",
+                    description: "",
+                    imageUrl: "https://cdn.pixabay.com/photo/2025/05/12/11/43/golden-retriever-amber-blue-9595177_640.jpg",
+                },
+                {
+                    postId: 102,
+                    state: "목격",
+                    date: "2025-04-07T12:00:00Z",
+                    address: "",
+                    description: "",
+                    imageUrl: "https://cdn.pixabay.com/photo/2022/10/24/14/21/puppy-7543571_640.jpg",
+                },
+                {
+                    postId: 103,
+                    state: "공고중",
+                    date: "2025-04-08T15:30:00Z",
+                    address: "",
+                    description: "",
+                    imageUrl: "https://cdn.pixabay.com/photo/2014/03/05/19/23/dog-280332_640.jpg",
+                },
+                {
+                    postId: 104,
+                    state: "입양대기",
+                    date: "2025-04-07T12:00:00Z",
+                    address: "",
+                    description: "",
+                    imageUrl: "https://cdn.pixabay.com/photo/2017/10/04/02/24/puppy-2814858_640.jpg",
+                },
+            ];
+            var markers = [
+                {
+                    postId: 101,
+                    state: "실종",
+                    species: "강아지",
+                    coordinate: { latitude: 35.15370617788286, longitude: 128.10458786497426 },
+                },
+                {
+                    postId: 102,
+                    state: "목격",
+                    species: "강아지",
+                    coordinate: { latitude: 35.15025559573217, longitude: 128.10344385423755 },
+                },
+                {
+                    postId: 103,
+                    state: "입양대기",
+                    species: "강아지",
+                    coordinate: { latitude: 35.15437516280344, longitude: 128.0864234799635 },
+                },
+                {
+                    postId: 104,
+                    state: "공고중",
+                    species: "강아지",
+                    coordinate: { latitude: 35.16341285540574, longitude: 128.1115239070281 },
+                },
+            ];
+
+            function getStatusClass(status) {
+                switch (status) {
+                    case "실종": return "status-missing";
+                    case "목격": return "status-witness";
+                    case "입양대기": return "status-adopt";
+                    case "공고중": return "status-notice";
+                    default: return "status-default";
+                }
+            }
+            function createCustomMarker(lat, lng, imageUrl, status) {
+                var markerContent = document.createElement("div");
+                markerContent.className = "custom-marker-wrapper";
+                var circle = document.createElement("div");
+                circle.className = "custom-marker-circle " + getStatusClass(status);
+                var img = document.createElement("img");
+                img.src = imageUrl;
+                circle.appendChild(img);
+                markerContent.appendChild(circle);
+                var badge = document.createElement("div");
+                badge.className = "custom-marker-badge " + getStatusClass(status);
+                badge.innerText = status;
+                markerContent.appendChild(badge);
+                var customOverlay = new kakao.maps.CustomOverlay({
+                    position: new kakao.maps.LatLng(lat, lng),
+                    content: markerContent,
+                    yAnchor: 1,
+                });
+                customOverlay.setMap(map);
+            }
+            for (let i = 0; i < posts.length; i++) {
+                let marker = markers[i];
+                let post = posts[i];
+                createCustomMarker(
+                    marker.coordinate.latitude,
+                    marker.coordinate.longitude,
+                    post.imageUrl || "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+                    marker.state
+                );
+            }
+        }
+        // 글쓰기 모드일 때
+        else if (mode === "writePost") {
+            var latlng = map.getCenter();
+            var markerPosition = new kakao.maps.LatLng(latlng.getLat(), latlng.getLng());
+            var marker = new kakao.maps.Marker({ position: markerPosition });
+            marker.setMap(map);
+
+            var infowindow = new kakao.maps.InfoWindow({ zindex: 1 });
+            var geocoder = new kakao.maps.services.Geocoder();
+
+            function searchDetailAddrFromCoords(coords, callback) {
+                geocoder.coord2Address(coords.getLng(), coords.getLat(), callback);
+            }
+
+            searchDetailAddrFromCoords(latlng, function (result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    detailAddr = result[0].address.address_name;
+                    var content = '<div class="customInfoWindow"><div>' + detailAddr + "</div></div>";
+                    marker.setPosition(new kakao.maps.LatLng(latlng.getLat(), latlng.getLng()));
+                    infowindow.setContent(content);
+                    infowindow.open(map, marker);
                 }
             });
 
-            //메인 화면일 때
-            if (mode === "main") {
-                var posts = [];
-                var markers = [];
-                // 상태별 색상 클래스 반환 함수 (border와 badge에 모두 사용)
-                function getStatusClass(status) {
-                    switch (status) {
-                        case "실종":
-                            return "status-missing";
-                        case "목격":
-                            return "status-witness";
-                        case "입양대기":
-                            return "status-adopt";
-                        case "공고중":
-                            return "status-notice";
-                        default:
-                            return "status-default";
-                    }
-                }
-                // 커스텀 마커 생성 함수
-                function createCustomMarker(lat, lng, imageUrl, status) {
-                    // 마커 전체 컨테이너
-                    var markerContent = document.createElement("div");
-                    markerContent.className = "custom-marker-wrapper";
-
-                    // 원형 이미지와 테두리
-                    var circle = document.createElement("div");
-                    circle.className = "custom-marker-circle " + getStatusClass(status);
-                    var img = document.createElement("img");
-                    img.src = imageUrl;
-                    circle.appendChild(img);
-                    markerContent.appendChild(circle);
-
-                    // 상태 텍스트 배지
-                    var badge = document.createElement("div");
-                    badge.className = "custom-marker-badge " + getStatusClass(status);
-                    badge.innerText = status;
-                    markerContent.appendChild(badge);
-
-                    var customOverlay = new kakao.maps.CustomOverlay({
-                        position: new kakao.maps.LatLng(lat, lng),
-                        content: markerContent,
-                        yAnchor: 1,
-                    });
-
-                    customOverlay.setMap(map);
-                }
-
-                //임시 데이터
-                posts = [
-                    {
-                        postId: 101,
-                        state: "실종",
-                        date: "2025-04-08T15:30:00Z",
-                        address: "",
-                        description: "",
-                        imageUrl:
-                            "https://cdn.pixabay.com/photo/2025/05/12/11/43/golden-retriever-amber-blue-9595177_640.jpg",
-                    },
-                    {
-                        postId: 102,
-                        state: "목격",
-                        date: "2025-04-07T12:00:00Z",
-                        address: "",
-                        description: "",
-                        imageUrl: "https://cdn.pixabay.com/photo/2022/10/24/14/21/puppy-7543571_640.jpg",
-                    },
-                    {
-                        postId: 103,
-                        state: "공고중",
-                        date: "2025-04-08T15:30:00Z",
-                        address: "",
-                        description: "",
-                        imageUrl: "https://cdn.pixabay.com/photo/2014/03/05/19/23/dog-280332_640.jpg",
-                    },
-                    {
-                        postId: 104,
-                        state: "입양대기",
-                        date: "2025-04-07T12:00:00Z",
-                        address: "",
-                        description: "",
-                        imageUrl: "https://cdn.pixabay.com/photo/2017/10/04/02/24/puppy-2814858_640.jpg",
-                    },
-                ];
-                markers = [
-                    {
-                        postId: 101,
-                        state: "실종",
-                        species: "강아지",
-                        coordinate: {
-                            latitude: 35.15370617788286,
-                            longitude: 128.10458786497426,
-                        },
-                    },
-                    {
-                        postId: 102,
-                        state: "목격",
-                        species: "강아지",
-                        coordinate: {
-                            latitude: 35.15025559573217,
-                            longitude: 128.10344385423755,
-                        },
-                    },
-                    {
-                        postId: 103,
-                        state: "입양대기",
-                        species: "강아지",
-                        coordinate: {
-                            latitude: 35.15437516280344,
-                            longitude: 128.0864234799635,
-                        },
-                    },
-                    {
-                        postId: 104,
-                        state: "공고중",
-                        species: "강아지",
-                        coordinate: {
-                            latitude: 35.16341285540574,
-                            longitude: 128.1115239070281,
-                        },
-                    },
-                ];
-                for (let i = 0; i < posts.length; i++) {
-                    let marker = markers[i];
-                    let post = posts[i];
-                    createCustomMarker(
-                        marker.coordinate.latitude,
-                        marker.coordinate.longitude,
-                        post.imageUrl || "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
-                        marker.state
-                    );
-                }
-            }
-            // 글쓰기 모드일 때
-            else if (mode === "writePost") {
-                // 지도 중앙에 마커를 생성합니다
+            kakao.maps.event.addListener(map, "center_changed", function () {
                 var latlng = map.getCenter();
-                var markerPosition = new kakao.maps.LatLng(latlng.getLat(), latlng.getLng());
-                var marker = new kakao.maps.Marker({
-                    position: markerPosition,
-                });
-                marker.setMap(map);
+                marker.setPosition(new kakao.maps.LatLng(latlng.getLat(), latlng.getLng()));
+                infowindow.close(map, marker);
+            });
 
-                var detailAddr = "";
-                var infowindow = new kakao.maps.InfoWindow({ zindex: 1 });
-                // 주소-좌표 변환 객체를 생성합니다
-                var geocoder = new kakao.maps.services.Geocoder();
+            kakao.maps.event.addListener(map, "idle", function () {
+                var latlng = map.getCenter();
                 searchDetailAddrFromCoords(latlng, function (result, status) {
                     if (status === kakao.maps.services.Status.OK) {
                         detailAddr = result[0].address.address_name;
-
-                        var content = '<div class="customInfoWindow">' + "<div>" + detailAddr + "</div>" + "</div>";
-
+                        var content = '<div class="customInfoWindow"><div>' + detailAddr + "</div></div>";
                         marker.setPosition(new kakao.maps.LatLng(latlng.getLat(), latlng.getLng()));
-
-                        // 인포윈도우에 클릭한 위치에 대한 법정동 상세 주소정보를 표시합니다
                         infowindow.setContent(content);
                         infowindow.open(map, marker);
                     }
                 });
-                // 좌표로 행정동 주소 정보를 요청합니다
-                function searchAddrFromCoords(coords, callback) {
-                    geocoder.coord2RegionCode(coords.getLng(), coords.getLat(), callback);
-                }
-
-                // 좌표로 법정동 상세 주소 정보를 요청합니다
-                function searchDetailAddrFromCoords(coords, callback) {
-                    geocoder.coord2Address(coords.getLng(), coords.getLat(), callback);
-                }
-
-                //센터가 이동할때마다 마커의 위치 변경
-                kakao.maps.event.addListener(map, "center_changed", function () {
-                    // 지도의  레벨을 얻어옵니다
-                    var level = map.getLevel();
-
-                    // 지도의 중심좌표를 얻어옵니다
-                    var latlng = map.getCenter();
-
-                    marker.setPosition(new kakao.maps.LatLng(latlng.getLat(), latlng.getLng()));
-                    infowindow.close(map, marker);
-                });
-
-                // 중심 좌표나 확대 수준이 변경됐을 때 지도 중심 좌표에 대한 주소 정보를 표시하도록 이벤트를 등록합니다
-                kakao.maps.event.addListener(map, "idle", function () {
-                    var latlng = map.getCenter();
-                    searchDetailAddrFromCoords(latlng, function (result, status) {
-                        if (status === kakao.maps.services.Status.OK) {
-                            detailAddr = result[0].address.address_name;
-
-                            var content = '<div class="customInfoWindow">' + "<div>" + detailAddr + "</div>" + "</div>";
-
-                            marker.setPosition(new kakao.maps.LatLng(latlng.getLat(), latlng.getLng()));
-
-                            // 인포윈도우에 클릭한 위치에 대한 법정동 상세 주소정보를 표시합니다
-                            infowindow.setContent(content);
-                            infowindow.open(map, marker);
-                        }
-                    });
-                });
-            }
-        </script>
-    </body>
+            });
+        }
+    </script>
+</body>
 </html>
 
 <style>
-    /* 게시글 작성 시 위치 설정 인포윈도우 */
     .customInfoWindow {
         width: 200px;
         max-width: 300px;
@@ -307,7 +245,6 @@
         justify-content: center;
         align-items: center;
     }
-    /* 메인화면 마커 스타일 */
     .custom-marker-wrapper {
         display: flex;
         flex-direction: column;
@@ -333,21 +270,11 @@
         object-fit: cover;
         border-radius: 50%;
     }
-    .custom-marker-circle.status-missing {
-        border-color: #ff3b30;
-    }
-    .custom-marker-circle.status-witness {
-        border-color: #0057ff;
-    }
-    .custom-marker-circle.status-adopt {
-        border-color: #ffd600;
-    }
-    .custom-marker-circle.status-notice {
-        border-color: #1abc54;
-    }
-    .custom-marker-circle.status-default {
-        border-color: #ccc;
-    }
+    .custom-marker-circle.status-missing { border-color: #ff3b30; }
+    .custom-marker-circle.status-witness { border-color: #0057ff; }
+    .custom-marker-circle.status-adopt { border-color: #ffd600; }
+    .custom-marker-circle.status-notice { border-color: #1abc54; }
+    .custom-marker-circle.status-default { border-color: #ccc; }
     .custom-marker-badge {
         min-width: 30px;
         padding: 3px 9px;
@@ -361,19 +288,9 @@
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
         letter-spacing: 1px;
     }
-    .custom-marker-badge.status-missing {
-        background: #ff3b30;
-    }
-    .custom-marker-badge.status-witness {
-        background: #0057ff;
-    }
-    .custom-marker-badge.status-adopt {
-        background: #ffd600;
-    }
-    .custom-marker-badge.status-notice {
-        background: #1abc54;
-    }
-    .custom-marker-badge.status-default {
-        background: #ccc;
-    }
+    .custom-marker-badge.status-missing { background: #ff3b30; }
+    .custom-marker-badge.status-witness { background: #0057ff; }
+    .custom-marker-badge.status-adopt { background: #ffd600; }
+    .custom-marker-badge.status-notice { background: #1abc54; }
+    .custom-marker-badge.status-default { background: #ccc; }
 </style>
