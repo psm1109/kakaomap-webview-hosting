@@ -30,7 +30,7 @@
             map = new kakao.maps.Map(container, options);
         } else {
             setTimeout(function () {
-                window.staticMaplatlng = { lat: 35.15385872250456, lng: 128.10169273462938 };
+                window.staticMaplatlng = window.staticMaplatlng || { lat: 35.15385872250456, lng: 128.10169273462938 };
                 var container = document.getElementById("map");
                 var options = {
                     center: new kakao.maps.LatLng(window.staticMaplatlng.lat, window.staticMaplatlng.lng),
