@@ -279,12 +279,7 @@
                         fillOpacity: 0, // 내부는 투명
                     });
                     rectangle.setMap(map);
-                }
-
-                // 지도 idle(이동/확대/축소 후)마다 사각형 다시 그림
-                kakao.maps.event.addListener(map, "idle", function () {
-                    drawRectangle();
-                    const bounds = {
+                     const bounds = {
                         type: "80_PERCENT_BOUNDS",
                         payload: {
                             sw_bounds: rectSW,
@@ -292,6 +287,11 @@
                         },
                     };
                     window.ReactNativeWebView.postMessage(JSON.stringify(bounds));
+                }
+
+                // 지도 idle(이동/확대/축소 후)마다 사각형 다시 그림
+                kakao.maps.event.addListener(map, "idle", function () {
+                    drawRectangle();
                 });
 
                 // 최초 1회 실행
