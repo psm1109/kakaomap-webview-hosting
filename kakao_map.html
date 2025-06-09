@@ -31,33 +31,6 @@
             var map = null;
             var detailAddr = "";
 
-            // 지도 생성
-            if (mode !== "staticMap") {
-                var container = document.getElementById("map");
-                var options = {
-                    center: new kakao.maps.LatLng(35.15385872250456, 128.10169273462938),
-                    level: 4,
-                    maxLevel: 8,
-                    disableDoubleClickZoom: true,
-                };
-                map = new kakao.maps.Map(container, options);
-            } else {
-                setTimeout(function () {
-                    window.staticMaplatlng = window.staticMaplatlng || {
-                        lat: 35.15385872250456,
-                        lng: 128.10169273462938,
-                    };
-                    var container = document.getElementById("map");
-                    var options = {
-                        center: new kakao.maps.LatLng(window.staticMaplatlng.lat, window.staticMaplatlng.lng),
-                        level: 3,
-                        draggable: false,
-                        disableDoubleClickZoom: true,
-                    };
-                    map = new kakao.maps.Map(container, options);
-                }, 100);
-            }
-
             // 지도 중심 이동 함수
             function setCenter(x, y) {
                 if (map) {
@@ -66,32 +39,17 @@
                 }
             }
 
-            // expo로부터 메세지를 받으면 작동하는 핸들러
-            window.document.addEventListener("message", function (event) {
-                let data = JSON.parse(event.data);
-
-                if (data.type === "setCenter") {
-                    const { lat, lng } = data.payload;
-                    setCenter(lat, lng);
-                }
-                if (data.type === "getAddress") {
-                    var latlng = map.getCenter();
-                    const message = {
-                        type: "LOCATION",
-                        payload: {
-                            lat: latlng.getLat(),
-                            lng: latlng.getLng(),
-                            address: detailAddr,
-                        },
-                    };
-                    if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
-                        window.ReactNativeWebView.postMessage(JSON.stringify(message));
-                    }
-                }
-            });
-
             // 메인 화면일 때
             if (mode === "main") {
+                var container = document.getElementById("map");
+                var options = {
+                    center: new kakao.maps.LatLng(35.15385872250456, 128.10169273462938),
+                    level: 4,
+                    maxLevel: 8,
+                    disableDoubleClickZoom: true,
+                };
+                map = new kakao.maps.Map(container, options);
+
                 var posts = [
                     {
                         postId: 101,
@@ -198,9 +156,36 @@
                         marker.state
                     );
                 }
+
+                kakao.maps.event.addListener(map, "idle", function () {
+                    const bounds = map.getBounds();
+                    const sw = bounds.getSouthWest();
+                    const ne = bounds.getNorthEast();
+
+                    const message = {
+                        type: "BOUNDS",
+                        payload: {
+                            sw_bounds: { lat: sw.getLat(), lng: sw.getLng() },
+                            ne_bounds: { lat: ne.getLat(), lng: ne.getLng() },
+                        },
+                    };
+
+                    if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+                        window.ReactNativeWebView.postMessage(JSON.stringify(message));
+                    }
+                });
             }
             // 글쓰기 모드일 때
             else if (mode === "writePost") {
+                var container = document.getElementById("map");
+                var options = {
+                    center: new kakao.maps.LatLng(35.15385872250456, 128.10169273462938),
+                    level: 4,
+                    maxLevel: 8,
+                    disableDoubleClickZoom: true,
+                };
+                map = new kakao.maps.Map(container, options);
+
                 var latlng = map.getCenter();
                 var markerPosition = new kakao.maps.LatLng(latlng.getLat(), latlng.getLng());
                 var marker = new kakao.maps.Marker({ position: markerPosition });
@@ -223,12 +208,6 @@
                     }
                 });
 
-                kakao.maps.event.addListener(map, "center_changed", function () {
-                    var latlng = map.getCenter();
-                    marker.setPosition(new kakao.maps.LatLng(latlng.getLat(), latlng.getLng()));
-                    infowindow.close(map, marker);
-                });
-
                 kakao.maps.event.addListener(map, "idle", function () {
                     var latlng = map.getCenter();
                     searchDetailAddrFromCoords(latlng, function (result, status) {
@@ -241,28 +220,69 @@
                         }
                     });
                 });
+            } //
+            else if (mode === "staticMap") {
+                // 정적 지도 모드
+                setTimeout(function () {
+                    window.staticMaplatlng = window.staticMaplatlng || {
+                        lat: 35.15385872250456,
+                        lng: 128.10169273462938,
+                    };
+                    var container = document.getElementById("map");
+                    var options = {
+                        center: new kakao.maps.LatLng(window.staticMaplatlng.lat, window.staticMaplatlng.lng),
+                        level: 3,
+                        draggable: false,
+                        disableDoubleClickZoom: true,
+                    };
+                    map = new kakao.maps.Map(container, options);
+                }, 100);
             }
 
-            // 테스트 지도
-            else if (mode === "test") {
-                kakao.maps.event.addListener(map, "idle", function () {
-                    const bounds = map.getBounds();
-                    const sw = bounds.getSouthWest();
-                    const ne = bounds.getNorthEast();
+            // expo로부터 메세지를 받으면 작동하는 핸들러
+            window.document.addEventListener("message", function (event) {
+                let data = JSON.parse(event.data);
 
+                if (data.type === "setCenter") {
+                    const { lat, lng } = data.payload;
+                    setCenter(lat, lng);
+                } //
+                else if (data.type === "getAddress") {
+                    var latlng = map.getCenter();
                     const message = {
-                        type: "BOUNDS",
+                        type: "LOCATION",
                         payload: {
-                            sw_bounds: { lat: sw.getLat(), lng: sw.getLng() },
-                            ne_bounds: { lat: ne.getLat(), lng: ne.getLng() },
+                            lat: latlng.getLat(),
+                            lng: latlng.getLng(),
+                            address: detailAddr,
                         },
                     };
-
                     if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
                         window.ReactNativeWebView.postMessage(JSON.stringify(message));
                     }
-                });
-            }
+                }
+            });
+
+            // 테스트 지도
+            // else if (mode === "test") {
+            //     kakao.maps.event.addListener(map, "idle", function () {
+            //         const bounds = map.getBounds();
+            //         const sw = bounds.getSouthWest();
+            //         const ne = bounds.getNorthEast();
+
+            //         const message = {
+            //             type: "BOUNDS",
+            //             payload: {
+            //                 sw_bounds: { lat: sw.getLat(), lng: sw.getLng() },
+            //                 ne_bounds: { lat: ne.getLat(), lng: ne.getLng() },
+            //             },
+            //         };
+
+            //         if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+            //             window.ReactNativeWebView.postMessage(JSON.stringify(message));
+            //         }
+            //     });
+            // }
         </script>
     </body>
 </html>
