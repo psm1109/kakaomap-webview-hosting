@@ -213,6 +213,12 @@
                         }
                     });
 
+                    kakao.maps.event.addListener(map, "center_changed", function () {
+                        var latlng = map.getCenter();
+                        marker.setPosition(new kakao.maps.LatLng(latlng.getLat(), latlng.getLng()));
+                        infowindow.close(map, marker);
+                    });
+                    
                     kakao.maps.event.addListener(map, "idle", function () {
                         var latlng = map.getCenter();
                         searchDetailAddrFromCoords(latlng, function (result, status) {
