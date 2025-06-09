@@ -180,7 +180,7 @@
                 });
             }
             // 글쓰기 모드일 때
-            else if (mode === "writePost") {
+            if (mode === "writePost") {
                 kakao.maps.load(() => {
                     var container = document.getElementById("map");
                     var options = {
@@ -227,7 +227,7 @@
                     });
                 });
             } //
-            else if (mode === "staticMap") {
+            if (mode === "staticMap") {
                 // 정적 지도 모드
                 kakao.maps.load(() => {
                     setTimeout(function () {
