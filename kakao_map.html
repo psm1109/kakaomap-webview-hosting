@@ -41,15 +41,23 @@
 
             // 메인 화면일 때
             if (mode === "main") {
-                var container = document.getElementById("map");
-                var options = {
-                    center: new kakao.maps.LatLng(35.15385872250456, 128.10169273462938),
-                    level: 4,
-                    maxLevel: 8,
-                    disableDoubleClickZoom: true,
+                window.onload = () => {
+                    var container = document.getElementById("map");
+                    var options = {
+                        center: new kakao.maps.LatLng(35.15385872250456, 128.10169273462938),
+                        level: 4,
+                        maxLevel: 8,
+                        disableDoubleClickZoom: true,
+                    };
+                    map = new kakao.maps.Map(container, options);
+                    
+                    setTimeout(() => {
+                        map.relayout();
+                    }, 300);
                 };
-                map = new kakao.maps.Map(container, options);
-
+                
+                
+                
                 var posts = [
                     {
                         postId: 101,
