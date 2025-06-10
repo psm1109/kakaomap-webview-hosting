@@ -28,8 +28,10 @@
         <script>
             const urlParams = new URLSearchParams(location.search);
             const mode = urlParams.get("mode");
+            //전역
             var map = null;
             var detailAddr = "";
+            const customMarkers = [];
 
             // 지도 중심 이동 함수
             function setCenter(x, y) {
@@ -73,6 +75,13 @@
                     yAnchor: 1,
                 });
                 customOverlay.setMap(map);
+                customMarkers.push(customOverlay); // 배열에 저장
+            }
+            function clearAllMarkers() {
+                for (let i = 0; i < customMarkers.length; i++) {
+                    customMarkers[i].setMap(null); // 마커 지도에서 제거
+                }
+                customMarkers.length = 0; // 배열 초기화
             }
             const stateMap = {
                 LOST: "실종",
@@ -224,6 +233,9 @@
                     const markers = data.payload.markers;
 
                     for (let i = 0; i < markers.length; i++) {
+                        //기존 마커 삭제
+                        clearAllMarkers();
+
                         let marker = markers[i];
                         createCustomMarker(
                             marker.coordinate.latitude,
