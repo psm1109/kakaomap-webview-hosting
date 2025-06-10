@@ -51,6 +51,20 @@
                     };
                     map = new kakao.maps.Map(container, options);
 
+                    const bounds = map.getBounds();
+                    const sw = bounds.getSouthWest();
+                    const ne = bounds.getNorthEast();
+                    const message = {
+                        type: "BOUNDS",
+                        payload: {
+                            sw_bounds: { lat: sw.getLat(), lng: sw.getLng() },
+                            ne_bounds: { lat: ne.getLat(), lng: ne.getLng() },
+                        },
+                    };
+                    console.log("Initial bounds:", message.payload);
+                    if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+                        window.ReactNativeWebView.postMessage(JSON.stringify(message));
+                    }
                     var posts = [
                         {
                             postId: 101,
