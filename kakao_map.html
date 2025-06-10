@@ -221,7 +221,7 @@
                         window.ReactNativeWebView.postMessage(JSON.stringify(message));
                     }
                 } else if (data.type === "markerData") {
-                    const markers = data.payload;
+                    const markers = data.payload.markers;
 
                     for (let i = 0; i < markers.length; i++) {
                         let marker = markers[i];
