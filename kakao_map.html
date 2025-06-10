@@ -55,14 +55,27 @@
                         return "status-default";
                 }
             }
+            function convertToHttpsImageUrl(url) {
+                if (!url) return "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
 
+                // HTTP를 사용하는 이미지만 프록시 처리
+                if (url.startsWith("http://")) {
+                    const encodedUrl = encodeURIComponent(url.replace("http://", ""));
+                    return `https://images.weserv.nl/?url=${encodedUrl}`;
+                }
+
+                // 이미 HTTPS면 그대로 사용
+                return url;
+            }
+
+            
             function createCustomMarker(lat, lng, imageUrl, status) {
                 var markerContent = document.createElement("div");
                 markerContent.className = "custom-marker-wrapper";
                 var circle = document.createElement("div");
                 circle.className = "custom-marker-circle " + getStatusClass(status);
                 var img = document.createElement("img");
-                img.src = imageUrl;
+                img.src = convertToHttpsImageUrl(imageUrl);
                 circle.appendChild(img);
                 markerContent.appendChild(circle);
                 var badge = document.createElement("div");
