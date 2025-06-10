@@ -133,6 +133,125 @@
                         }
                     });
                 });
+                const markers = [
+                    {
+                        address: "곤명 초량",
+                        coordinate: { latitude: 35.0374430341451, longitude: 128.10829488424835 },
+                        imageUrl:
+                            "http://openapi.animal.go.kr/openapi/service/rest/fileDownloadSrvc/files/shelter/2025/05/20250610140687[1].jpg",
+                        petType: "DOG",
+                        postId: 5,
+                        state: "NOTICE",
+                    },
+                    {
+                        address: "곤명 초량",
+                        coordinate: { latitude: 35.0374430341451, longitude: 128.10829488424835 },
+                        imageUrl:
+                            "http://openapi.animal.go.kr/openapi/service/rest/fileDownloadSrvc/files/shelter/2025/05/202506101406969.jpg",
+                        petType: "DOG",
+                        postId: 6,
+                        state: "NOTICE",
+                    },
+                    {
+                        address: "곤양 은사마을",
+                        coordinate: { latitude: 35.0374430341451, longitude: 128.10829488424835 },
+                        imageUrl:
+                            "http://openapi.animal.go.kr/openapi/service/rest/fileDownloadSrvc/files/shelter/2025/06/202506101306244.jpg",
+                        petType: "DOG",
+                        postId: 7,
+                        state: "NOTICE",
+                    },
+                    {
+                        address: "사천시유기동물보호소",
+                        coordinate: { latitude: 35.0374430341451, longitude: 128.10829488424835 },
+                        imageUrl:
+                            "http://openapi.animal.go.kr/openapi/service/rest/fileDownloadSrvc/files/shelter/2025/06/202506101206707.jpg",
+                        petType: "DOG",
+                        postId: 8,
+                        state: "NOTICE",
+                    },
+                    {
+                        address: "사천시유기동물보호소",
+                        coordinate: { latitude: 35.0374430341451, longitude: 128.10829488424835 },
+                        imageUrl:
+                            "http://openapi.animal.go.kr/openapi/service/rest/fileDownloadSrvc/files/shelter/2025/06/20250610120650.jpg",
+                        petType: "DOG",
+                        postId: 9,
+                        state: "NOTICE",
+                    },
+                    {
+                        address: "사천시유기동물보호소",
+                        coordinate: { latitude: 35.0374430341451, longitude: 128.10829488424835 },
+                        imageUrl:
+                            "http://openapi.animal.go.kr/openapi/service/rest/fileDownloadSrvc/files/shelter/2025/06/202506101206528.jpg",
+                        petType: "DOG",
+                        postId: 10,
+                        state: "NOTICE",
+                    },
+                    {
+                        address: "사천시유기동물보호소",
+                        coordinate: { latitude: 35.0374430341451, longitude: 128.10829488424835 },
+                        imageUrl:
+                            "http://openapi.animal.go.kr/openapi/service/rest/fileDownloadSrvc/files/shelter/2025/06/202506101206197.jpg",
+                        petType: "DOG",
+                        postId: 11,
+                        state: "NOTICE",
+                    },
+                    {
+                        address: "사천시유기동물보호소",
+                        coordinate: { latitude: 35.0374430341451, longitude: 128.10829488424835 },
+                        imageUrl:
+                            "http://openapi.animal.go.kr/openapi/service/rest/fileDownloadSrvc/files/shelter/2025/06/202506101206631.jpg",
+                        petType: "DOG",
+                        postId: 12,
+                        state: "NOTICE",
+                    },
+                    {
+                        address: "사천시유기동물보호소",
+                        coordinate: { latitude: 35.0374430341451, longitude: 128.10829488424835 },
+                        imageUrl:
+                            "http://openapi.animal.go.kr/openapi/service/rest/fileDownloadSrvc/files/shelter/2025/06/202506101106957.jpg",
+                        petType: "DOG",
+                        postId: 13,
+                        state: "NOTICE",
+                    },
+                    {
+                        address: "사 천시유기동물보호소",
+                        coordinate: { latitude: 35.0374430341451, longitude: 128.10829488424835 },
+                        imageUrl:
+                            "http://openapi.animal.go.kr/openapi/service/rest/fileDownloadSrvc/files/shelter/2025/06/202506101106938.jpg",
+                        petType: "DOG",
+                        postId: 14,
+                        state: "NOTICE",
+                    },
+                    {
+                        address: "곤명 초량",
+                        coordinate: { latitude: 35.0374430341451, longitude: 128.10829488424835 },
+                        imageUrl:
+                            "http://openapi.animal.go.kr/openapi/service/rest/fileDownloadSrvc/files/shelter/2025/05/20250610170633.jpg",
+                        petType: "DOG",
+                        postId: 124,
+                        state: "NOTICE",
+                    },
+                    {
+                        address: "곤명 초량",
+                        coordinate: { latitude: 35.0374430341451, longitude: 128.10829488424835 },
+                        imageUrl:
+                            "http://openapi.animal.go.kr/openapi/service/rest/fileDownloadSrvc/files/shelter/2025/05/202506101706941.jpg",
+                        petType: "DOG",
+                        postId: 125,
+                        state: "NOTICE",
+                    },
+                ];
+                for (let i = 0; i < markers.length; i++) {
+                    let marker = markers[i];
+                    createCustomMarker(
+                        marker.coordinate.latitude,
+                        marker.coordinate.longitude,
+                        marker.imageUrl || "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+                        marker.state
+                    );
+                }
             }
             // 글쓰기 모드일 때
             if (mode === "writePost") {
@@ -231,19 +350,18 @@
                     }
                 } else if (data.type === "markerData") {
                     //기존 마커 삭제
-                    clearAllMarkers();
-                    
-                    const markers = data.payload.markers;
-                    for (let i = 0; i < markers.length; i++) {
-                        let marker = markers[i];
-                        createCustomMarker(
-                            marker.coordinate.latitude,
-                            marker.coordinate.longitude,
-                            marker.imageUrl ||
-                                "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
-                            marker.state
-                        );
-                    }
+                    // const markers = data.payload.markers;
+                    // clearAllMarkers();
+                    // for (let i = 0; i < markers.length; i++) {
+                    //     let marker = markers[i];
+                    //     createCustomMarker(
+                    //         marker.coordinate.latitude,
+                    //         marker.coordinate.longitude,
+                    //         marker.imageUrl ||
+                    //             "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+                    //         marker.state
+                    //     );
+                    // }
                 }
             });
         </script>
