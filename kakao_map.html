@@ -231,9 +231,9 @@
                     }
                 } else if (data.type === "markerData") {
                     //기존 마커 삭제
-                    const markers = data.payload.markers;
                     clearAllMarkers();
-
+                    const markers = data.payload.markers;
+                    
                     for (let i = 0; i < markers.length; i++) {
                         let marker = markers[i];
                         createCustomMarker(
