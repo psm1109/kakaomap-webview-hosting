@@ -39,6 +39,47 @@
                 }
             }
 
+            function getStatusClass(status) {
+                switch (status) {
+                    case "LOST":
+                        return "status-missing";
+                    case "SIGHT":
+                        return "status-witness";
+                    case "ADOPT":
+                        return "status-adopt";
+                    case "NOTICE":
+                        return "status-notice";
+                    default:
+                        return "status-default";
+                }
+            }
+
+            function createCustomMarker(lat, lng, imageUrl, status) {
+                var markerContent = document.createElement("div");
+                markerContent.className = "custom-marker-wrapper";
+                var circle = document.createElement("div");
+                circle.className = "custom-marker-circle " + getStatusClass(status);
+                var img = document.createElement("img");
+                img.src = imageUrl;
+                circle.appendChild(img);
+                markerContent.appendChild(circle);
+                var badge = document.createElement("div");
+                badge.className = "custom-marker-badge " + getStatusClass(status);
+                badge.innerText = stateMap[status];
+                markerContent.appendChild(badge);
+                var customOverlay = new kakao.maps.CustomOverlay({
+                    position: new kakao.maps.LatLng(lat, lng),
+                    content: markerContent,
+                    yAnchor: 1,
+                });
+                customOverlay.setMap(map);
+            }
+            const stateMap = {
+                LOST: "실종",
+                SIGHT: "목격",
+                ADOPT: "입양대기",
+                NOTICE: "공고중",
+            };
             // 메인 화면일 때
             if (mode === "main") {
                 kakao.maps.load(() => {
@@ -61,117 +102,8 @@
                             ne_bounds: { lat: ne.getLat(), lng: ne.getLng() },
                         },
                     };
-                    console.log("Initial bounds:", message.payload);
                     if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
                         window.ReactNativeWebView.postMessage(JSON.stringify(message));
-                    }
-                    var posts = [
-                        {
-                            postId: 101,
-                            state: "실종",
-                            date: "2025-04-08T15:30:00Z",
-                            address: "",
-                            description: "",
-                            imageUrl:
-                                "https://cdn.pixabay.com/photo/2025/05/12/11/43/golden-retriever-amber-blue-9595177_640.jpg",
-                        },
-                        {
-                            postId: 102,
-                            state: "목격",
-                            date: "2025-04-07T12:00:00Z",
-                            address: "",
-                            description: "",
-                            imageUrl: "https://cdn.pixabay.com/photo/2022/10/24/14/21/puppy-7543571_640.jpg",
-                        },
-                        {
-                            postId: 103,
-                            state: "공고중",
-                            date: "2025-04-08T15:30:00Z",
-                            address: "",
-                            description: "",
-                            imageUrl: "https://cdn.pixabay.com/photo/2014/03/05/19/23/dog-280332_640.jpg",
-                        },
-                        {
-                            postId: 104,
-                            state: "입양대기",
-                            date: "2025-04-07T12:00:00Z",
-                            address: "",
-                            description: "",
-                            imageUrl: "https://cdn.pixabay.com/photo/2017/10/04/02/24/puppy-2814858_640.jpg",
-                        },
-                    ]; // 생략
-                    var markers = [
-                        {
-                            postId: 101,
-                            state: "실종",
-                            species: "강아지",
-                            coordinate: { latitude: 35.15370617788286, longitude: 128.10458786497426 },
-                        },
-                        {
-                            postId: 102,
-                            state: "목격",
-                            species: "강아지",
-                            coordinate: { latitude: 35.15025559573217, longitude: 128.10344385423755 },
-                        },
-                        {
-                            postId: 103,
-                            state: "입양대기",
-                            species: "강아지",
-                            coordinate: { latitude: 35.15437516280344, longitude: 128.0864234799635 },
-                        },
-                        {
-                            postId: 104,
-                            state: "공고중",
-                            species: "강아지",
-                            coordinate: { latitude: 35.16341285540574, longitude: 128.1115239070281 },
-                        },
-                    ];
-
-                    function getStatusClass(status) {
-                        switch (status) {
-                            case "실종":
-                                return "status-missing";
-                            case "목격":
-                                return "status-witness";
-                            case "입양대기":
-                                return "status-adopt";
-                            case "공고중":
-                                return "status-notice";
-                            default:
-                                return "status-default";
-                        }
-                    }
-
-                    function createCustomMarker(lat, lng, imageUrl, status) {
-                        var markerContent = document.createElement("div");
-                        markerContent.className = "custom-marker-wrapper";
-                        var circle = document.createElement("div");
-                        circle.className = "custom-marker-circle " + getStatusClass(status);
-                        var img = document.createElement("img");
-                        img.src = imageUrl;
-                        circle.appendChild(img);
-                        markerContent.appendChild(circle);
-                        var badge = document.createElement("div");
-                        badge.className = "custom-marker-badge " + getStatusClass(status);
-                        badge.innerText = status;
-                        markerContent.appendChild(badge);
-                        var customOverlay = new kakao.maps.CustomOverlay({
-                            position: new kakao.maps.LatLng(lat, lng),
-                            content: markerContent,
-                            yAnchor: 1,
-                        });
-                        customOverlay.setMap(map);
-                    }
-
-                    for (let i = 0; i < posts.length; i++) {
-                        let marker = markers[i];
-                        let post = posts[i];
-                        createCustomMarker(
-                            marker.coordinate.latitude,
-                            marker.coordinate.longitude,
-                            post.imageUrl || "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
-                            marker.state
-                        );
                     }
 
                     kakao.maps.event.addListener(map, "idle", function () {
@@ -232,7 +164,7 @@
                         marker.setPosition(new kakao.maps.LatLng(latlng.getLat(), latlng.getLng()));
                         infowindow.close(map, marker);
                     });
-                    
+
                     kakao.maps.event.addListener(map, "idle", function () {
                         var latlng = map.getCenter();
                         searchDetailAddrFromCoords(latlng, function (result, status) {
@@ -287,6 +219,19 @@
                     };
                     if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
                         window.ReactNativeWebView.postMessage(JSON.stringify(message));
+                    }
+                } else if (data.type === "markerData") {
+                    const markers = data.payload;
+
+                    for (let i = 0; i < markers.length; i++) {
+                        let marker = markers[i];
+                        createCustomMarker(
+                            marker.coordinate.latitude,
+                            marker.coordinate.longitude,
+                            marker.imageUrl ||
+                                "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+                            marker.state
+                        );
                     }
                 }
             });
