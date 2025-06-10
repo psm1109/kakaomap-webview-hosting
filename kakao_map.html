@@ -230,12 +230,11 @@
                         window.ReactNativeWebView.postMessage(JSON.stringify(message));
                     }
                 } else if (data.type === "markerData") {
+                    //기존 마커 삭제
+                    clearAllMarkers();
+                    
                     const markers = data.payload.markers;
-
                     for (let i = 0; i < markers.length; i++) {
-                        //기존 마커 삭제
-                        clearAllMarkers();
-
                         let marker = markers[i];
                         createCustomMarker(
                             marker.coordinate.latitude,
